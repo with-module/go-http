@@ -1,5 +1,7 @@
 package api
 
+import "net/http"
+
 type (
 	response struct {
 		httpCode    int
@@ -39,9 +41,9 @@ const (
 	StatusError   ResponseStatus = "error"
 )
 
-func Response(httpCode int, opts ...ResponseOption) ResponseState {
+func Response(opts ...ResponseOption) ResponseState {
 	resp := &response{
-		httpCode:    httpCode,
+		httpCode:    http.StatusOK,
 		bodyContent: nil,
 	}
 	for _, fn := range opts {
@@ -76,6 +78,12 @@ func WithErr(err error) ResponseOption {
 			Status: StatusError,
 			Error:  he,
 		}
+	})
+}
+
+func WithHttp(code int) ResponseOption {
+	return useOption(func(r *response) {
+		r.httpCode = code
 	})
 }
 
