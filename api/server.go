@@ -22,12 +22,6 @@ type (
 		} `json:"timeout" yaml:"timeout" config:"timeout"`
 	}
 
-	RouteConfig struct {
-		Enabled bool   `config:"enabled" json:"enabled" yaml:"enabled"`
-		Method  string `config:"method" json:"method" yaml:"method"`
-		Path    string `config:"path" json:"path" yaml:"path"`
-	}
-
 	Server struct {
 		*http.Server
 		config ServerConfig
