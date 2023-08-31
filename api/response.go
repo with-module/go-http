@@ -53,9 +53,7 @@ func Response(opts ...ResponseOption) ResponseState {
 }
 
 func ResponseErr(err error) ResponseState {
-	resp := new(response)
-	WithErr(err).use(resp)
-	return resp
+	return Response(WithErr(err))
 }
 
 func (resp *response) StatusCode() int {
