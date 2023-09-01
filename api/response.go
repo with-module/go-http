@@ -8,7 +8,7 @@ type (
 		bodyContent any
 	}
 
-	ResponseState interface {
+	Response interface {
 		StatusCode() int
 		Body() any
 	}
@@ -41,7 +41,7 @@ const (
 	StatusError   ResponseStatus = "error"
 )
 
-func Response(opts ...ResponseOption) ResponseState {
+func ResponseWith(opts ...ResponseOption) Response {
 	resp := &response{
 		httpCode:    http.StatusOK,
 		bodyContent: nil,
@@ -52,8 +52,8 @@ func Response(opts ...ResponseOption) ResponseState {
 	return resp
 }
 
-func ResponseErr(err error) ResponseState {
-	return Response(WithErr(err))
+func ResponseErr(err error) Response {
+	return ResponseWith(WithErr(err))
 }
 
 func (resp *response) StatusCode() int {
