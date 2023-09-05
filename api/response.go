@@ -25,7 +25,7 @@ type (
 		// status response, can be `success` or `error`
 		Status ResponseStatus `json:"status" validate:"required" enums:"success" example:"success"`
 		// data response after processing request, available if `status == "success"`
-		Data T `json:"data" validate:"required"`
+		Data T `json:"data,omitempty"`
 	}
 
 	ResponseError struct {
