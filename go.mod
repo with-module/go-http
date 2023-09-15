@@ -1,11 +1,10 @@
-module gitlab.com/with-junbach/go-modules/http
+module github.com/with-module/go-http
 
 go 1.21.0
 
 require (
 	github.com/google/uuid v1.3.1
 	github.com/stretchr/testify v1.8.4
-	gitlab.com/with-junbach/go-modules/use v1.0.0
 )
 
 require (

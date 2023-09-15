@@ -3,7 +3,7 @@ package middleware
 import (
 	"context"
 	"github.com/google/uuid"
-	"gitlab.com/with-junbach/go-modules/use"
+	"github.com/with-module/go-http/use"
 	"net/http"
 )
 
@@ -26,8 +26,7 @@ func RequestIDWithConfig(config RequestIDConfig) Handler {
 			headerKey := use.GetOrDefault(config.HeaderKey, defaultRequestIDHeaderKey)
 			requestID := r.Header.Get(headerKey)
 			if requestID != "" {
-				fn := use.GetOrDefault(config.Generator, uuid.NewString)
-				requestID = fn()
+				requestID = use.If(config.Generator != nil, config.Generator, uuid.NewString)()
 			}
 
 			w.Header().Set(headerKey, requestID)
