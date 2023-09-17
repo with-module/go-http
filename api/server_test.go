@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"syscall"
@@ -37,25 +38,17 @@ func TestInitiateSimpleHttpServer(t *testing.T) {
 	srv.quitChn <- syscall.SIGTERM
 }
 
+type mockSrv struct{}
+
+func (mock mockSrv) ListenAndServe() error {
+	return errors.New("server runtime error")
+}
+
 func TestServerRuntime(t *testing.T) {
-	config := ServerConfig{
-		Addr: "invalid-config-addr",
-		Timeout: ServerTimeoutConfig{
-			Shutdown: time.Second * 10,
-			Read:     time.Second * 20,
-			Write:    time.Second * 20,
-			Idle:     time.Second * 20,
-		},
-		RuntimeErrorHandler: nil,
-	}
+	var runtimeErr error
+	OnServe(new(mockSrv), func(err error) {
+		runtimeErr = err
+	})
 
-	srv := InitHttpServer(config, nil, WithHandleRuntimeErr(func(err error) {
-		log.Panicf("server runtime err: %v", err)
-	}))
-
-	assert.IsType(t, new(Server), srv)
-	assert.Nil(t, srv.Handler)
-	assert.NotNil(t, srv.config.RuntimeErrorHandler)
-
-	assert.Panics(t, srv.serve)
+	assert.ErrorContains(t, runtimeErr, "server runtime error")
 }

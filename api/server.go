@@ -55,7 +55,7 @@ func InitHttpServer(config ServerConfig, handler http.Handler, fns ...OverrideSe
 
 func (s *Server) ServeHttp() error {
 	// start the server connection
-	go s.serve()
+	go OnServe(s, s.config.RuntimeErrorHandler)
 
 	// kill (no param) default send syscall.SIGTERM
 	// kill -2 is syscall.SIGINT
@@ -71,10 +71,13 @@ func (s *Server) ServeHttp() error {
 	return s.Shutdown(ctx)
 }
 
-func (s *Server) serve() {
-	err := s.ListenAndServe()
-	if fn := s.config.RuntimeErrorHandler; fn != nil && err != nil && !errors.Is(err, http.ErrServerClosed) {
-		fn(err)
+type apiServer interface {
+	ListenAndServe() error
+}
+
+func OnServe(srv apiServer, onRuntimeErr func(error)) {
+	if err := srv.ListenAndServe(); err != nil && onRuntimeErr != nil && !errors.Is(err, http.ErrServerClosed) {
+		onRuntimeErr(err)
 	}
 }
 
