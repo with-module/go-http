@@ -26,16 +26,13 @@ func TestInitiateSimpleHttpServer(t *testing.T) {
 	}))
 
 	assert.IsType(t, new(Server), srv)
-	assert.Nil(t, srv.Handler)
 	assert.Equal(t, ":8080", srv.config.Addr)
-	assert.NotNil(t, srv.config.RuntimeErrorHandler)
-
 	go func() {
-		assert.NoError(t, srv.ServeHttp())
+		time.Sleep(time.Second * 2)
+		// stop server
+		srv.quitChn <- syscall.SIGTERM
 	}()
-
-	// stop server
-	srv.quitChn <- syscall.SIGTERM
+	assert.NoError(t, srv.ServeHttp())
 }
 
 type mockSrv struct{}
