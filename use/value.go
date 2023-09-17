@@ -5,11 +5,11 @@ func IsZero[T comparable](input T) bool {
 }
 
 func GetOrDefaultFunc[T comparable](input T, getDefault func() T) T {
-	return ifOrElseFunc(IsZero(input), input, getDefault)
+	return ifOrElseFunc(!IsZero(input), input, getDefault)
 }
 
 func GetOrDefault[T comparable](input T, defaultVal T) T {
-	return If(IsZero(input), input, defaultVal)
+	return If(!IsZero(input), input, defaultVal)
 }
 
 func ifOrElseFunc[T any](cond bool, thenVal T, elseFunc func() T) T {
