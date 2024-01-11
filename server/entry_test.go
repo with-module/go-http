@@ -1,4 +1,4 @@
-package api
+package server
 
 import (
 	"errors"
@@ -10,22 +10,21 @@ import (
 )
 
 func TestInitiateSimpleHttpServer(t *testing.T) {
-	config := ServerConfig{
+	config := Config{
 		Addr: ":8080",
-		Timeout: ServerTimeoutConfig{
+		Timeout: TimeoutConfig{
 			Shutdown: time.Second * 10,
 			Read:     time.Second * 20,
 			Write:    time.Second * 20,
 			Idle:     time.Second * 20,
 		},
-		RuntimeErrorHandler: nil,
 	}
 
-	srv := InitHttpServer(config, nil, WithHandleRuntimeErr(func(err error) {
+	srv := New(config, nil, UseRuntimeErrHandle(func(err error) {
 		log.Fatalf("server runtime err: %v", err)
 	}))
 
-	assert.IsType(t, new(Server), srv)
+	assert.IsType(t, new(S), srv)
 	assert.Equal(t, ":8080", srv.config.Addr)
 	go func() {
 		time.Sleep(time.Second * 2)

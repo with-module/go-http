@@ -26,4 +26,7 @@ func TestGetOrDefault(t *testing.T) {
 	assert.EqualValues(t, 250, GetOrDefaultFunc(250, func() int {
 		return 256
 	}))
+	assert.EqualValues(t, time.Minute, GetOrDefaultFunc(Zero[time.Duration](), func() time.Duration {
+		return time.Minute
+	}))
 }

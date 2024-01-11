@@ -1,20 +1,19 @@
-package middleware
+package context
 
 import (
 	"context"
+	"github.com/with-module/go-http/middleware"
 	"net/http"
 )
 
-type (
-	BindContextConfig struct {
-		Skipper Skipper
-		Binder  func(r *http.Request) context.Context
-	}
-)
+type Config struct {
+	Skipper middleware.Skipper
+	Binder  func(r *http.Request) context.Context
+}
 
-func BindContext(config BindContextConfig) Handler {
+func Middleware(config Config) middleware.Handler {
 	return func(next http.Handler) http.Handler {
-		fn := func(w http.ResponseWriter, r *http.Request) {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if fn := config.Skipper; fn != nil && fn(r) {
 				next.ServeHTTP(w, r)
 				return
@@ -23,10 +22,8 @@ func BindContext(config BindContextConfig) Handler {
 				next.ServeHTTP(w, r)
 				return
 			}
-
 			ctx := config.Binder(r)
 			next.ServeHTTP(w, r.WithContext(ctx))
-		}
-		return http.HandlerFunc(fn)
+		})
 	}
 }

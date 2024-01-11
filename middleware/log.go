@@ -1,40 +1,33 @@
 package middleware
 
 import (
+	"context"
 	"fmt"
-	"net/http"
-	"time"
+	"log/slog"
+	"strings"
 )
 
 type (
-	RequestLoggerConfig struct {
-		Skipper   Skipper
-		GetLogger UseLogger
-		GetStatus func(w http.ResponseWriter, r *http.Request) int
+	Logger interface {
+		Info(string, ...any)
+		Error(string, ...any)
 	}
+
+	UseLogger func(ctx context.Context) Logger
 )
 
-func RequestLogger(config RequestLoggerConfig) Handler {
-	return func(next http.Handler) http.Handler {
-		fn := func(w http.ResponseWriter, r *http.Request) {
-			if fn := config.Skipper; fn != nil && fn(r) {
-				next.ServeHTTP(w, r)
-				return
-			}
-			startTime := time.Now()
-			next.ServeHTTP(w, r)
-			log := config.GetLogger(r.Context())
-			if log == nil {
-				return
-			}
-			status := config.GetStatus(w, r)
-			fn := log.Info
-			if status > 399 {
-				fn = log.Error
-			}
+func DefaultLogger(_ context.Context) Logger {
+	return slog.Default()
+}
 
-			fn(fmt.Sprintf("%s request %s has been completed in %s with status %d", r.Method, r.RequestURI, time.Since(startTime), status))
-		}
-		return http.HandlerFunc(fn)
-	}
+type TestLogger struct {
+	strings.Builder
+}
+
+func (tl *TestLogger) Info(msg string, args ...any) {
+	tl.WriteString(fmt.Sprintf("\nINFO %s: %+v", msg, args))
+}
+
+func (tl *TestLogger) Error(msg string, args ...any) {
+	tl.WriteString(fmt.Sprintf("\nERROR %s: %+v", msg, args))
 }

@@ -1,9 +1,9 @@
 module github.com/with-module/go-http
 
-go 1.21.0
+go 1.21
 
 require (
-	github.com/google/uuid v1.3.1
+	github.com/google/uuid v1.5.0
 	github.com/stretchr/testify v1.8.4
 )
 

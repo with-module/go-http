@@ -1,7 +1,11 @@
 package use
 
 func IsZero[T comparable](input T) bool {
-	return input == *new(T)
+	return input == Zero[T]()
+}
+
+func Zero[T any]() T {
+	return *new(T)
 }
 
 func GetOrDefaultFunc[T comparable](input T, getDefault func() T) T {
